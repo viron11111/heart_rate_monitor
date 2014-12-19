@@ -6,6 +6,15 @@
 By: Andrew Gray
 Date started: December 19, 2014
 */
+#include "Timer.h"
+#include "fontsLCD.h"
+#include <SoftwareSerial.h>
+
+fontsLCD fonts;  //initialize font library
+int counter = 0; //counter for adjusting screen saver
+
+Timer t;  //initialize timer library
+
 int beat = 2;  //Pin reading red LED (interrupt 0)
 int acqr = 4;  //Pin reading green LED
 int stby = 3;  //Pin reading yellow LED (interrupt 1)
@@ -33,9 +42,12 @@ void setup()
   //Place yellow and green LED pins as input
   pinMode(acqr, INPUT);
   pinMode(stby, INPUT);
+  pinMode(beat, INPUT);
   
   //Default baudrate for Sparkfun LCD backpack (160x128 pixels)
   Serial.begin(115200);
+  
+  t.every(1000, display);
   
   //intialize state to no heart beat detected
   no_pulse();
@@ -59,17 +71,23 @@ void loop()
     }    
   }
   
-  //Heart rate detected, calculate BPM and display in debug window
+  //Heart rate detected, calculate BPM 
   else if (no_pulse_latch == 0 && acq_pulse_latch == 0 && beat_pulse_latch == 1){  
     attachInterrupt(1, no_pulse, RISING);
     beat_time = newtime - oldtime;
     BPM = 60 / (((float) beat_time) / 1000);
-      
-    if ((int) BPM >= 35 && (int) BPM <= 225){
-      Serial.println((int) BPM);  
-    }
   }
-  delay(10);
+  t.update();  //For updating timer used with diplaying graphic
+}
+
+void display(){  //Display current state onto LCD screen
+  if ((int) BPM >= 35 && (int) BPM <= 225 && beat_pulse_latch == 1){
+    Serial.println((int) BPM);  
+  }
+  counter ++;
+  if (counter >= 4){
+    counter = 0;
+  }
 }
 
 //Function for heart rate detection (red LED)
@@ -83,12 +101,14 @@ void BPM_timer(){
 
 //Function run when no pulse detected (yellow LED)
 void no_pulse(){
-  Serial.println("No pulse detected...");
-  no_pulse_latch = 1;
-  acq_pulse_latch = 0;
-  beat_pulse_latch = 0;
-  lastDebounceTime = millis();
-  detachInterrupt(1);
+  if(digitalRead(stby) == 1 and digitalRead(beat) != 1){  //Added to prevent "no pulse dectected during transition from acq to detected
+    Serial.println("No pulse detected...");
+    no_pulse_latch = 1;
+    acq_pulse_latch = 0;
+    beat_pulse_latch = 0;
+    lastDebounceTime = millis();
+    detachInterrupt(1);
+  }
 }
 
 //Function for pulse detected but no beat yet (green LED)
