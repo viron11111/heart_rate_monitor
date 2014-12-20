@@ -10,7 +10,7 @@ Date started: December 19, 2014
 #include "fontsLCD.h"
 #include <SoftwareSerial.h>
 
-fontsLCD fonts;  //initialize font library
+fontsLCD f;  //initialize font library
 int counter = 0; //counter for adjusting screen saver
 
 Timer t;  //initialize timer library
@@ -24,12 +24,16 @@ unsigned long oldtime = 0;
 unsigned long newtime = 0;
 int beat_time = 0;
 float BPM = 0.0;
+int num1 = 0;
+int num2 = 0;
+int num3 = 0;
 
 //Latches used for different states
 //program starts with no heart rate detected
 boolean no_pulse_latch = 1;
 boolean acq_pulse_latch = 0;
 boolean beat_pulse_latch = 0;
+byte state = B0;
 
 //Variables used to debounce hand sensors
 long lastDebounceTime = 0;
@@ -37,6 +41,8 @@ long debounceDelay = 300;  //minimum time required to transition between states
 
 void setup()
 {
+  randomSeed(analogRead(0));
+  
   attachInterrupt(0, BPM_timer, RISING);  //Interrupt used to get accurate measurement for BPM
 
   //Place yellow and green LED pins as input
@@ -47,7 +53,7 @@ void setup()
   //Default baudrate for Sparkfun LCD backpack (160x128 pixels)
   Serial.begin(115200);
   
-  t.every(1000, display);
+  t.every(500, display);
   
   //intialize state to no heart beat detected
   no_pulse();
@@ -81,8 +87,27 @@ void loop()
 }
 
 void display(){  //Display current state onto LCD screen
-  if ((int) BPM >= 35 && (int) BPM <= 225 && beat_pulse_latch == 1){
+  if ((int) BPM >= 35 && (int) BPM <= 225 && beat_pulse_latch == 1 && state == B11){
     Serial.println((int) BPM);  
+    num1 = (int)BPM / 100;
+    num2 = ((int)BPM - (num1*100)) / 10;
+    num3 = ((int)BPM - (num1*100)) % 10 ; 
+    f.display_number(num1, num2, num3);
+    //Serial.println(num1);
+    //Serial.println(num2);
+    //Serial.println(num3);
+  }
+  else if (state == B10){
+    //Serial.println("Acquiring pulse...");
+    f.acquiring_pulse(counter);
+    //state = B100;
+  }
+  else if (state == B00){
+    //Serial.println("No pulse detected...");
+    int randx = random(1, 50);
+    int randy = random(1, 114);
+    f.no_pulse(counter, randx, randy);
+    //state = B100;
   }
   counter ++;
   if (counter >= 4){
@@ -95,6 +120,7 @@ void BPM_timer(){
   no_pulse_latch = 0;
   acq_pulse_latch = 0;
   beat_pulse_latch = 1;
+  state = B11;
   oldtime = newtime;
   newtime = millis();
 }
@@ -102,10 +128,11 @@ void BPM_timer(){
 //Function run when no pulse detected (yellow LED)
 void no_pulse(){
   if(digitalRead(stby) == 1 and digitalRead(beat) != 1){  //Added to prevent "no pulse dectected during transition from acq to detected
-    Serial.println("No pulse detected...");
+    //Serial.println("No pulse detected...");
     no_pulse_latch = 1;
     acq_pulse_latch = 0;
     beat_pulse_latch = 0;
+    state = B0;
     lastDebounceTime = millis();
     detachInterrupt(1);
   }
@@ -116,6 +143,7 @@ void acquiring(){
   no_pulse_latch = 0;
   acq_pulse_latch = 1;
   beat_pulse_latch = 0;
-  Serial.println("Acquiring pulse...");
+  //Serial.println("Acquiring pulse...");
+  state = B10;
   lastDebounceTime = millis();
 }
