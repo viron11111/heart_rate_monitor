@@ -53,7 +53,7 @@ void setup()
   //Default baudrate for Sparkfun LCD backpack (160x128 pixels)
   Serial.begin(115200);
   
-  t.every(500, display);
+  t.every(2000, display);
   
   //intialize state to no heart beat detected
   no_pulse();
