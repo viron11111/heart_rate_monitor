@@ -104,8 +104,8 @@ void display(){  //Display current state onto LCD screen
   }
   else if (state == B00){
     //Serial.println("No pulse detected...");
-    int randx = random(1, 50);
-    int randy = random(1, 114);
+    int randx = random(1, 55);
+    int randy = random(34, 85);
     f.no_pulse(counter, randx, randy);
     //state = B100;
   }
