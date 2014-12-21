@@ -15,7 +15,7 @@ class fontsLCD
 {
 	public:
 	fontsLCD();
-	void no_pulse(int counter);
+	void no_pulse(int counter, int randx, int randy);
 	void acquiring_pulse(int counter);
 	void display_number(int num1, int num2, int num3);
     void toggleReverseMode();
