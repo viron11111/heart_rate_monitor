@@ -74,7 +74,8 @@ void drawLine(byte x1, byte y1, byte x2, byte y2, byte set)
   delay(10);
 
 }
-/*
+//***************Solid Numbers**********************************
+
 void zero(int x)
 {
     delay(15);
@@ -214,9 +215,10 @@ void nine(int x)
         drawLine(i+x, 34, i+x, 69, 1);
     }
 }
-*/
+
 //****************************************************************************
 //Hollow numbers
+/*
 void zero(int x)
 {
     delay(15);
@@ -351,33 +353,42 @@ void seven(int x)
 void eight(int x)
 {
     delay(15);
-    int i = 0;
-    for (i=34; i<= 44; i++){
-        drawLine(2+x, i, 34+x, i, 1);
-        drawLine(2+x, i+25, 34+x, i+25, 1);
-        drawLine(2+x, i+50, 34+x, i+50, 1);
-    }
-    for (i=2; i<= 12; i++){
-        drawLine(i+x+22, 34, i+x+22, 94, 1);
-        drawLine(i+x, 34, i+x, 94, 1);
-    }
+
+    drawLine(2+x, 34, 34+x, 34, 1);
+    drawLine(12+x, 44, 24+x, 44, 1);
+    drawLine(12+x, 59, 24+x, 59, 1);
+    drawLine(12+x, 69, 24+x, 69, 1);
+    drawLine(12+x, 84, 24+x, 84, 1);
+    drawLine(2+x, 94, 34+x, 94, 1);
+
+    drawLine(2+x, 34, 2+x, 94, 1);
+    drawLine(12+x, 69, 12+x, 84, 1);
+    drawLine(12+x, 44, 12+x, 59, 1);
+    drawLine(24+x, 69, 24+x, 84, 1);
+    drawLine(24+x, 44, 24+x, 59, 1);
+    drawLine(34+x, 34, 34+x, 94, 1);
 }
 
 void nine(int x)
 {
     delay(15);
-    int i = 0;
-    for (i=34; i<= 44; i++){
-        drawLine(2+x, i, 34+x, i, 1);
-        drawLine(2+x, i+25, 34+x, i+25, 1);
-        drawLine(2+x, i+50, 34+x, i+50, 1);
-    }
-    for (i=2; i<= 12; i++){
-        drawLine(i+x+22, 34, i+x+22, 94, 1);
-        drawLine(i+x, 34, i+x, 69, 1);
-    }
+
+    drawLine(2+x, 34, 34+x, 34, 1);
+    drawLine(12+x, 44, 24+x, 44, 1);
+    drawLine(12+x, 59, 24+x, 59, 1);
+    drawLine(2+x, 69, 24+x, 69, 1);
+    drawLine(2+x, 84, 24+x, 84, 1);
+    drawLine(2+x, 94, 34+x, 94, 1);
+
+    drawLine(2+x, 34, 2+x, 69, 1);
+    drawLine(2+x, 84, 2+x, 94, 1);
+    drawLine(12+x, 44, 12+x, 59, 1);
+    drawLine(24+x, 69, 24+x, 84, 1);
+    drawLine(24+x, 44, 24+x, 59, 1);
+    drawLine(34+x, 34, 34+x, 94, 1);
 }
 //**************************************************************************
+*/
 
 void no_pulse_words()
 {

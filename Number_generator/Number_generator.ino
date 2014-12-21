@@ -39,7 +39,7 @@ void setup()
   //Default baudrate for Sparkfun LCD backpack (160x128 pixels)
   Serial.begin(115200);
   
-  t.every(2000, display);
+  t.every(2100, display);
 
 }
 
