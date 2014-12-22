@@ -40,7 +40,7 @@ void setup()
   Serial.begin(115200);
   
   t.every(2100, display);
-
+  f.clearScreen();
 }
 
 void loop()
@@ -53,6 +53,7 @@ void display(){  //Display current state onto LCD screen
   num1 = counter1;
   num2 = counter2;
   num3 = counter3;
+
   f.display_number(num1, num2, num3);
   
   counter1++;

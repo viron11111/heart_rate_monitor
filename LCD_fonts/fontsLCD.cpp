@@ -16,12 +16,41 @@ fontsLCD::fontsLCD()
 	serial.begin(115200);
 }
 //-------------------------------------------------------------------------------------------
+void eraseBlock(byte x1, byte y1, byte x2, byte y2)
+{
+  //This is just like the draw box command, except the contents of the box are erased to the background color
+  delay(15);
+  serial.write(0x7C);
+  serial.write(0x05);//CTRL e
+  serial.write(x1);
+  serial.write(y1);
+  serial.write(x2);
+  serial.write(y2);
+  delay(10);
+
+}
+
+void drawBox(byte x1, byte y1, byte x2, byte y2, byte set)
+{
+  //draws a box from two given points. You can set and reset just as the pixel function.
+  delay(15);
+  serial.write(0x7C);
+  serial.write(0x0F);//CTRL o
+  serial.write(x1);
+  serial.write(y1);
+  serial.write(x2);
+  serial.write(y2);
+  serial.write(0x01);
+  delay(10);
+
+}
+
 void ball(int x, int y)
 {
   serial.write(0x7C);
   serial.write(0x03);//CTRL c
-  serial.write(x+20);
-  serial.write(y+20);
+  serial.write(x);
+  serial.write(y);
   serial.write(8);
   serial.write(0x01);
 
@@ -39,7 +68,7 @@ void setHome()
   serial.write((byte)0);//set y back to 0
 }
 
-void clearScreen()
+void fontsLCD::clearScreen()
 {
   //clears the screen, you will use this a lot!
   serial.write(0x7C);
@@ -78,7 +107,11 @@ void drawLine(byte x1, byte y1, byte x2, byte y2, byte set)
 
 void zero(int x)
 {
-    delay(15);
+
+    eraseBlock(x+2, 34, x+34, 94);
+    delay(100);
+    //drawBox   (x+2, 34, x+34, 94, 1);
+    //delay(10);
     int i = 0;
     for (i=2; i<= 12; i++){
         drawLine(i+x, 34, i+x, 94, 1);
@@ -92,7 +125,10 @@ void zero(int x)
 
 void one(int x)
 {
-    delay(15);
+    eraseBlock(x+2, 34, x+34, 94);
+    delay(100);
+    //drawBox   (x+2, 34, x+34, 94, 1);
+    //delay(10);
     int i = 0;
     for (i=15; i<= 25; i++){
         drawLine(i+x, 34, i+x, 94, 1);
@@ -101,7 +137,10 @@ void one(int x)
 
 void two(int x)
 {
-    delay(15);
+    eraseBlock(x+2, 34, x+34, 94);
+    delay(100);
+    //drawBox   (x+2, 34, x+34, 94, 1);
+    //delay(10);
     int i = 0;
     for (i=34; i<= 44; i++){
         drawLine(2+x, i, 34+x, i, 1);
@@ -116,7 +155,10 @@ void two(int x)
 
 void three(int x)
 {
-    delay(15);
+    eraseBlock(x+2, 34, x+34, 94);
+    delay(100);
+    //drawBox   (x+2, 34, x+34, 94, 1);
+    //delay(10);
     int i = 0;
     for (i=34; i<= 44; i++){
         drawLine(2+x, i, 34+x, i, 1);
@@ -131,7 +173,10 @@ void three(int x)
 
 void four(int x)
 {
-    delay(15);
+    eraseBlock(x+2, 34, x+34, 94);
+    delay(100);
+    //drawBox   (x+2, 34, x+34, 94, 1);
+    //delay(10);
     int i = 0;
     for (i=2; i<= 12; i++){
         drawLine(i+x, 34, i+x, 59, 1);
@@ -145,7 +190,10 @@ void four(int x)
 
 void five(int x)
 {
-    delay(15);
+    eraseBlock(x+2, 34, x+34, 94);
+    delay(100);
+    //drawBox   (x+2, 34, x+34, 94, 1);
+    //delay(10);
     int i = 0;
     for (i=34; i<= 44; i++){
         drawLine(2+x, i, 34+x, i, 1);
@@ -160,7 +208,10 @@ void five(int x)
 
 void six(int x)
 {
-    delay(15);
+    eraseBlock(x+2, 34, x+34, 94);
+    delay(100);
+    //drawBox   (x+2, 34, x+34, 94, 1);
+    //delay(10);
     int i = 0;
     for (i=34; i<= 44; i++){
         drawLine(2+x, i, 34+x, i, 1);
@@ -175,7 +226,10 @@ void six(int x)
 
 void seven(int x)
 {
-    delay(15);
+    eraseBlock(x+2, 34, x+34, 94);
+    delay(100);
+    //drawBox   (x+2, 34, x+34, 94, 1);
+    //delay(10);
     int i = 0;
     for (i=34; i<= 44; i++){
         drawLine(2+x, i, 32+x, i, 1);
@@ -188,7 +242,10 @@ void seven(int x)
 
 void eight(int x)
 {
-    delay(15);
+    eraseBlock(x+2, 34, x+34, 94);
+    delay(100);
+    //drawBox   (x+2, 34, x+34, 94, 1);
+    //delay(10);
     int i = 0;
     for (i=34; i<= 44; i++){
         drawLine(2+x, i, 34+x, i, 1);
@@ -203,7 +260,10 @@ void eight(int x)
 
 void nine(int x)
 {
-    delay(15);
+    eraseBlock(x+2, 34, x+34, 94);
+    delay(100);
+    //drawBox   (x+2, 34, x+34, 94, 1);
+    //delay(10);
     int i = 0;
     for (i=34; i<= 44; i++){
         drawLine(2+x, i, 34+x, i, 1);
@@ -410,10 +470,8 @@ void acquire_pulse_words()
     serial.print("Acquiring pulse");
 }
 
-void fontsLCD::no_pulse(int counter, int x, int y)//no pulse detected
+void fontsLCD::no_pulse(int x, int y)//no pulse detected
 {
-    clearScreen();
-
     serial.write(0x7C);
     serial.write(0x18);//CTRL x
     serial.write(x);
@@ -427,40 +485,40 @@ void fontsLCD::no_pulse(int counter, int x, int y)//no pulse detected
 
 void fontsLCD::acquiring_pulse(int counter)//no pulse detected
 {
-    int y1 = 60, y2 = 60, y3 = 60, y4 = 60;
     switch (counter)
     {
         case 0:
-            y1 = 45;
+            delay(20);
+            eraseBlock(20, 70, 40, 90);
+            delay(20);
+            //drawBox   (20, 70, 40, 90, 1);
+            delay(10);
+            ball(60, 80);
             break;
         case 1:
-            y2 = 45;
+            delay(20);
+            eraseBlock(50, 70, 70, 90);
+            delay(20);
+            //drawBox   (50, 70, 70, 90, 1);
+            delay(10);
+            ball(30, 80);
             break;
-        case 2:
-            y3 = 45;
-            break;
-        case 3:
-            y4 = 45;
+        default:
             break;
     }
 
-    clearScreen();
-    delay(50);
-    //setHome();
-    ball(0, y1);
-    ball(40, y2);
-    ball(80, y3);
-    ball(120, y4);
+    delay(15);
     acquire_pulse_words();
 }
 
 void fontsLCD::display_number(int num1, int num2, int num3)
 {
-    clearScreen();
     switch (num1)
     {
         case 0:
             //zero(0);//display zero with x offset
+            eraseBlock(2, 34, 34, 94);
+            delay(100);
             break;
         case 1:
             one(0);//display zero with x offset
