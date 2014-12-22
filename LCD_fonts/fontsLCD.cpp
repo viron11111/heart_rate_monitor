@@ -485,23 +485,55 @@ void fontsLCD::no_pulse(int x, int y)//no pulse detected
 
 void fontsLCD::acquiring_pulse(int counter)//no pulse detected
 {
+    int x1 = 68, y1 = 58, x2 = 64, y2 = 55;
     switch (counter)
     {
         case 0:
-            delay(20);
+            delay(10);
+            eraseBlock(1+x2, 1+y2, 21+x2, 18+y2);
+            delay(40);
+            drawLine(7+x1, 3+y1, 5+x1, 1+y1, 1);
+            drawLine(5+x1, 1+y1, 3+x1, 1+y1, 1);
+            drawLine(3+x1, 1+y1, 1+x1, 3+y1, 1);
+            drawLine(1+x1, 3+y1, 1+x1, 5+y1, 1);
+            drawLine(1+x1, 5+y1, 7+x1, 11+y1, 1);
+            drawLine(7+x1, 11+y1, 13+x1, 5+y1, 1);
+            drawLine(13+x1, 5+y1, 13+x1, 3+y1, 1);
+            drawLine(13+x1, 3+y1, 11+x1, 1+y1, 1);
+            drawLine(11+x1, 1+y1, 9+x1, 1+y1, 1);
+            drawLine(9+x1, 1+y1, 7+x1, 3+y1, 1);
+
+
+            /*delay(20);
             eraseBlock(20, 70, 40, 90);
             delay(20);
             //drawBox   (20, 70, 40, 90, 1);
             delay(10);
-            ball(60, 80);
+            ball(60, 80);*/
             break;
         case 1:
-            delay(20);
+            delay(10);
+            eraseBlock(1+x1, 1+y1, 13+x1, 11+y1);
+            delay(40);
+            drawLine(11+x2, 3+y2, 10+x2, 2+y2, 1);
+            drawLine(9+x2, 2+y2, 8+x2, 1+y2, 1);
+            drawLine(8+x2, 1+y2, 4+x2, 1+y2, 1);
+            drawLine(4+x2, 1+y2, 1+x2, 4+y2, 1);
+            drawLine(1+x2, 4+y2, 1+x2, 8+y2, 1);
+            drawLine(1+x2, 8+y2, 11+x2, 18+y2, 1);
+            drawLine(11+x2, 18+y2, 21+x2, 8+y2, 1);
+            drawLine(21+x2, 8+y2, 21+x2, 4+y2, 1);
+            drawLine(21+x2, 4+y2, 18+x2, 1+y2, 1);
+            drawLine(18+x2, 1+y2, 14+x2, 1+y2, 1);
+            drawLine(14+x2, 1+y2, 13+x2, 2+y2, 1);
+            drawLine(12+x2, 2+y2, 11+x2, 3+y2, 1);
+
+            /*delay(20);
             eraseBlock(50, 70, 70, 90);
             delay(20);
             //drawBox   (50, 70, 70, 90, 1);
             delay(10);
-            ball(30, 80);
+            ball(30, 80);*/
             break;
         default:
             break;
