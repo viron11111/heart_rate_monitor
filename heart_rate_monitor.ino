@@ -189,9 +189,9 @@ void no_pulse(){
     acq_pulse_latch = 0;
     beat_pulse_latch = 0;
     state = B0;
-    num1_old = 0;
-    num2_old = 0;
-    num3_old = 0;
+    num1_old = 10;
+    num2_old = 10;
+    num3_old = 10;
     lastDebounceTime = millis();
     detachInterrupt(1);
   }
