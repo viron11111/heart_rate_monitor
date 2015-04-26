@@ -53,6 +53,7 @@ long debounceDelay = 300;  //minimum time required to transition between states
 
 void setup()
 {
+  
   randomSeed(analogRead(0));
   
   attachInterrupt(0, BPM_timer, RISING);  //Interrupt used to get accurate measurement for BPM
