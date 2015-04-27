@@ -1,4 +1,4 @@
-#include "Timer.h"
+t#include "Timer.h"
 #include "fontsLCD.h"
 #include <SoftwareSerial.h>
 
@@ -160,7 +160,79 @@ void no_hands(){
   debounceDelay = 400;
   attachInterrupt(0, right_Hand_Detect, FALLING);
 }
+
+void display(){  //Display current state onto LCD screen
   
+  state_new = state;
+  
+  if (state_new != state_old){
+    f.clearScreen();
+  }
+  
+  if ((int) BPM >= 35 && (int) BPM <= 225 && beat_pulse_latch == 1 && state == B11 && change_number_counter >= 21){
+    //Serial.println((int) BPM);  
+    num1_new = (int)BPM / 100;
+    num2_new = ((int)BPM - (num1_new*100)) / 10;
+    num3_new = ((int)BPM - (num1_new*100)) % 10 ; 
+    
+    if (num1_new != num1_old){
+      send1 = num1_new;
+    }
+    else
+      send1 = 10;
+      
+    if (num2_new != num2_old){
+      send2 = num2_new;
+    }
+    else
+      send2 = 10;
+
+    if (num3_new != num3_old){
+      send3 = num3_new;
+    }
+    else
+      send3 = 10;      
+      
+    //f.clearScreen();
+    f.display_number(send1, send2, send3);
+    change_number_counter = 0; 
+
+    num1_old = num1_new;
+    num2_old = num2_new;
+    num3_old = num3_new;
+    
+    //Serial.println(num1);
+    //Serial.println(num2);
+    //Serial.println(num3);
+  }
+  else if (state == B10 && beat_acquiring_counter >= 6){
+    //Serial.println(beat_acquiring_counter);
+    
+    //f.clearScreen();
+    f.acquiring_pulse(heart_counter);
+    beat_acquiring_counter = 0;    
+    heart_counter++;
+    if (heart_counter >= 2){
+      heart_counter = 0;
+    }
+    //state = B100;
+  }
+  else if (state == B00 && no_pulse_counter >= 21){
+    //Serial.println("No pulse detected...");
+    int randx = random(6, 55);
+    int randy = random(34, 85);
+    
+    f.clearScreen();
+    f.no_pulse(randx, randy);
+    no_pulse_counter = 0;    
+    //state = B100;
+  }
+  
+  change_number_counter++;
+  no_pulse_counter++;
+  beat_acquiring_counter++;  
+  state_old = state_new;
+}
 
 void right_Hand_Detect(){
   if(digitalRead(3) == 0 && no_pulse_latch == 1){
