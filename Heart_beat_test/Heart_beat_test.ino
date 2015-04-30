@@ -1,4 +1,4 @@
-t#include "Timer.h"
+#include "Timer.h"
 #include "fontsLCD.h"
 #include <SoftwareSerial.h>
 
@@ -211,13 +211,14 @@ void display(){  //Display current state onto LCD screen
     //f.clearScreen();
     f.acquiring_pulse(heart_counter);
     beat_acquiring_counter = 0;    
-    heart_counter++;
+    heart_counter = 0;
+    /*heart_counter++;
     if (heart_counter >= 2){
       heart_counter = 0;
-    }
+    }*/
     //state = B100;
   }
-  else if (state == B00 && no_pulse_counter >= 21){
+  else if (state == B0 && no_pulse_counter >= 21){
     //Serial.println("No pulse detected...");
     int randx = random(6, 55);
     int randy = random(34, 85);
