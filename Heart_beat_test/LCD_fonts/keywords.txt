@@ -1,0 +1,28 @@
+#######################################
+# fontsLCD Library
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+fontsLCD   KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+no_pulse	KEYWORD2
+acquiring_pulse	KEYWORD2
+display_number	KEYWORD2
+toggleReverseMode	KEYWORD2
+setBacklight	KEYWORD2
+clearScreen KEYWORD2
+
+#######################################
+# Instances (KEYWORD2)
+#######################################
+
+#######################################
+# Constants (LITERAL1)
+#######################################
