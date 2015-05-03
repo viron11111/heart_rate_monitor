@@ -1,3 +1,8 @@
+//****************************************************************************************
+//******* Heart rate monitor using modified AD8232 breakout board from SparkFun **********
+//*************************  Andy Gray, May 2015 *****************************************
+//****************************************************************************************
+
 #include "Timer.h"
 #include "fontsLCD.h"
 #include <SoftwareSerial.h>
@@ -33,7 +38,8 @@ unsigned long newtime = 0;
 int beat_time = 0;
 float BPM_new = 0.0;
 float BPM_old = 0.0;
-int high_value = 0;
+boolean new_beat = 0;
+int high_value = 400;
 float BPM = 0.0;
 int num1_old = 10;
 int num2_old = 10;
@@ -55,11 +61,11 @@ void setup() {
   pinMode(2, INPUT); // Setup for leads off detection LO +
   pinMode(3, INPUT); // Setup for leads off detection LO -
 
-  attachInterrupt(0, right_Hand_Detect, FALLING);
+  attachInterrupt(0, right_Hand_Detect, FALLING);  //To detect hands on sensors
   
-  lastDebounceTime = millis();
+  lastDebounceTime = millis();  //Start debounce timer
   
-  t.every(100, display);
+  t.every(100, display);  //Screen update multiplier.  Used 6x (600 ms) or 21x (2100 ms)
 }
 
 void loop() {
@@ -67,10 +73,10 @@ void loop() {
   if (digitalRead(2) == 0 && digitalRead(3) == 0 && (millis() - lastDebounceTime) > debounceDelay && no_pulse_latch == 1){  //***************************** Hands detected *****************************
     hands_detected();
   }
-  else if (acq_pulse_latch == 1 && digitalRead(2) == 0 && digitalRead(3) == 0){
+  else if (acq_pulse_latch == 1 && digitalRead(2) == 0 && digitalRead(3) == 0){  //****************************************** Acquiring beat ~3 seconds ******************************************************
     acquiring();
   }    
-  else if (beat_pulse_latch == 1 && digitalRead(2) == 0 && digitalRead(3) == 0){
+  else if (beat_pulse_latch == 1 && digitalRead(2) == 0 && digitalRead(3) == 0){  //*********************************************  Measuring beat function *****************************************************
     measure_beat();
   }    
   else if (((digitalRead(2) == 1)||(digitalRead(3) == 1)) && (millis() - lastDebounceTime) > debounceDelay && (acq_pulse_latch == 1 || beat_pulse_latch == 1)){ //*************************** Hands Removed ***************************
@@ -83,9 +89,8 @@ void loop() {
 }
 
 
-void hands_detected(){
+void hands_detected(){  //Arrives here only after hands have been on BOTH sensors for 1500 ms or longer
   if(digitalRead(2) == 0 && digitalRead(3) == 0){  //Added to prevent "no pulse dectected during transition from acq to detected
-    //Serial.println("Hands detected...");
     no_pulse_latch = 0;
     acq_pulse_latch = 1;
     beat_pulse_latch = 0;
@@ -95,17 +100,16 @@ void hands_detected(){
     num3_old = 10;
     lastDebounceTime = millis();
     detachInterrupt(0); 
-    //attachInterrupt(1, no_hands, RISING);
   }
 }
 
 void acquiring(){
   state = B10;
   sum = 0.0;   
-  high_value = 0;
+  high_value = 400;
     
   for (i=0; i <= amount; i++){
-    if( analogRead(A0) > high_value){
+    if( analogRead(A0) < high_value){
       high_value = analogRead(A0);
     }
     sum = sum + analogRead(A0);
@@ -119,7 +123,7 @@ void acquiring(){
   Serial.print("high value = ");
   Serial.println(high_value);
 
-  while(analogRead(A0) <= average + 25){
+  while(analogRead(A0) <= average + 40){
     if (digitalRead(2) == 1 || digitalRead(3) == 1){
       break;
     }
@@ -132,9 +136,7 @@ void acquiring(){
   beat_latch = 1;
   
   debounceDelay = 350;  //prevents multiple beat interruptions (too long and you may miss a beat)
- 
-  //Serial.println("First Beat");    
-  
+
   no_pulse_latch = 0;
   acq_pulse_latch = 0;
   beat_pulse_latch = 1;    
@@ -142,6 +144,7 @@ void acquiring(){
   
   change_number_counter = 21;  //improve transition time from acq to measuring beat time
   BPM_old = 0.0;
+  new_beat = 0;
   if (digitalRead(2) == 1 || digitalRead(3) == 1){
     no_hands();
   }  
@@ -150,55 +153,60 @@ void acquiring(){
 void measure_beat(){
   
   t.update();  //For updating timer used with diplaying graphic
+  
   if (beat_latch == 0 && a_read >= (average+40) && (millis() - lastDebounceTime) > debounceDelay){
-    state = B11;
     newtime = millis();
     beat_time = newtime - oldtime;    
     lastDebounceTime = millis();
     oldtime = newtime;
-    
-    BPM = 60 / (((float) beat_time) / 1000);
-    beat_latch = 1;    
-    //Serial.print("BPM_old: ");
-    //Serial.println(BPM_old);    
-    //Serial.print("BPM_new: ");
-    //Serial.println(BPM_new);
-    
-    /*if (BPM_old < 1){
-      beat_latch = 0;
+
+    BPM_new = 60 / (((float) beat_time) / 1000);
+
+    if (BPM_old < 38){    //For first heart beat, only happens once
+      Serial.print("IF1: ");
+      Serial.print(BPM_old);
+      Serial.print(" & ");
+      Serial.print(BPM_new);
+      Serial.print(" = ");
+      Serial.println(BPM);
       BPM_old = BPM_new;
-      BPM = 0.0;
-      beat_latch = 0;
+      BPM = 0.0;      
     }
-    else{
+    else if (BPM_new >= 38){  //detecting actual heartbeat, 38 is minimum BPM
+      Serial.print("IF2: ");
+      Serial.print(BPM_old);
+      Serial.print(" & ");
+      Serial.print(BPM_new);
+      Serial.print(" = ");
+      Serial.println(BPM);
       state = B11;
-      if (abs(BPM_old - BPM_new) > 15){
-        BPM = (BPM_old + BPM_new)/2.0;
-        BPM_old = BPM_new;
-      }
-      else{
-        BPM = BPM_new;
-        BPM_old = BPM_new;
-      }
+      BPM = (BPM_old + BPM_new)/2.0;
+      BPM_old = BPM_new;
       beat_latch = 1;
-    }*/
-    
-    
+    }
+    else {                   //Bad reading, revert to previous BPM
+      Serial.print("IF3: ");
+      Serial.print(BPM_old);
+      Serial.print(" & ");
+      Serial.print(BPM_new);
+      Serial.print(" = ");
+      Serial.println(BPM);    
+      BPM = BPM_old;
+    }  
   }
-  else if (beat_latch == 1 && a_read < average-20){
+  else if (beat_latch == 1 && a_read < average-40){   //In between beats
     beat_latch = 0;
   }
 }
 
-void no_hands(){
-  //detachInterrupt(1);
-  debounceDelay = 1500;
+void no_hands(){    //No hands detected
+  debounceDelay = 1500;  //change debounce delay for longer time period
   state = B0;
   no_pulse_latch = 1;
   acq_pulse_latch = 0;
   beat_pulse_latch = 0;
   average = 0.0;
-  attachInterrupt(0, right_Hand_Detect, FALLING);
+  attachInterrupt(0, right_Hand_Detect, FALLING);   //Interrupt for detcting when hands are on sensors
 }
 
 void display(){  //Display current state onto LCD screen
@@ -209,7 +217,7 @@ void display(){  //Display current state onto LCD screen
     f.clearScreen();
   }
   
-  if ((int) BPM >= 35 && (int) BPM <= 225 && beat_pulse_latch == 1 && state == B11 && change_number_counter >= 21){
+  if ((int) BPM >= 38 && (int) BPM <= 225 && beat_pulse_latch == 1 && state == B11 && change_number_counter >= 21){
     //Serial.println((int) BPM);  
     num1_new = (int)BPM / 100;
     num2_new = ((int)BPM - (num1_new*100)) / 10;
@@ -240,39 +248,38 @@ void display(){  //Display current state onto LCD screen
     num1_old = num1_new;
     num2_old = num2_new;
     num3_old = num3_new;
-    
-    //Serial.println(num1);
-    //Serial.println(num2);
-    //Serial.println(num3);
   }
   else if (state == B10 && beat_acquiring_counter >= 6){
-    //Serial.println(beat_acquiring_counter);
-    
-    //f.clearScreen();
     f.acquiring_pulse(heart_counter);
     beat_acquiring_counter = 0;    
-    //heart_counter = 0;
     heart_counter++;
     if (heart_counter >= 2){
       heart_counter = 0;
     }
-    //state = B100;
   }
   else if (state == B0 && no_pulse_counter >= 21){
-    //Serial.println("No pulse detected...");
     int randx = random(6, 55);
     int randy = random(34, 85);
     
     f.clearScreen();
     f.no_pulse(randx, randy);
     no_pulse_counter = 0;    
-    //state = B100;
   }
   
   change_number_counter++;
   no_pulse_counter++;
   beat_acquiring_counter++;  
   state_old = state_new;
+  
+  if (change_number_counter > 1000){
+    change_number_counter = 1000;
+  }
+  else if (no_pulse_counter > 1000){
+    no_pulse_counter = 1000;
+  }
+  else if (beat_acquiring_counter == 1000){
+    beat_acquiring_counter = 1000;
+  }
 }
 
 void right_Hand_Detect(){
