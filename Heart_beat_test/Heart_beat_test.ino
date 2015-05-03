@@ -113,6 +113,7 @@ void acquiring(){
       high_value = analogRead(A0);
     }
     sum = sum + analogRead(A0);
+    state = B10;    
     t.update();  //For updating timer used with diplaying graphic
     delay(1);
   }    
@@ -244,6 +245,7 @@ void display(){  //Display current state onto LCD screen
     //f.clearScreen();
     f.display_number(send1, send2, send3);
     change_number_counter = 0; 
+    beat_acquiring_counter = 0;    
 
     num1_old = num1_new;
     num2_old = num2_new;
@@ -264,6 +266,7 @@ void display(){  //Display current state onto LCD screen
     f.clearScreen();
     f.no_pulse(randx, randy);
     no_pulse_counter = 0;    
+    beat_acquiring_counter = 0;
   }
   
   change_number_counter++;
